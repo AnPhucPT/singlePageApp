@@ -1,0 +1,46 @@
+<!--  BrandCarousel Section  -->
+<div class="py-10">
+    <section class="splide" id="brand" aria-label="Splide Basic HTML Example">
+        <div class="splide__track">
+            <ul class="splide__list">
+                <li class="splide__slide" data-splide-interval="1000">
+                    <img src="/assets/img/brand/4.jpg" alt="">
+                </li>
+                <li class="splide__slide" data-splide-interval="1000">
+                    <img src="/assets/img/brand/3.jpg" alt="">
+                </li>
+                <li class="splide__slide" data-splide-interval="1000">
+                    <img src="/assets/img/brand/4.jpg" alt="">
+                </li>
+                <li class="splide__slide" data-splide-interval="1000">
+                    <img src="/assets/img/brand/5.jpg" alt="">
+                </li>
+            </ul>
+        </div>
+    </section>
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        new Splide('#brand', {
+            type: 'loop',
+            perPage: 7,
+            perMove: 1,
+            arrows: false,
+            snap: true,
+            breakpoints: {
+                1000: {
+                    perPage: 4,
+                },
+                700: {
+                    perPage: 3,
+                },
+            },
+            focus: 'center',
+            drag: 'free',
+            autoplay: true,
+        }).mount();
+    })
+</script>

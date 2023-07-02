@@ -15,12 +15,11 @@ for (const key in service) {
 app.config(function ($routeProvider) {
     $routeProvider
         .when('/', {
-            templateUrl: '/views/site/home.html',
+            templateUrl: '/pages/home/home.html',
             controller: 'homeController',
         })
         .otherwise({
             templateUrl: 'views/notFound.html',
         });
 });
-
 export default app;

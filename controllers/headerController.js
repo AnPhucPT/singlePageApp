@@ -2,6 +2,19 @@ function headerController(app) {
     app.controller(
         'headerController',
         function ($scope, $rootScope, cartService) {
+            $scope.headerNavItem = [
+                {
+                    name: 'Home',
+                    src: '/home',
+                    active: $rootScope.activeRoute === 'home',
+                },
+                {
+                    name: 'products',
+                    src: '/products',
+                    active: $rootScope.activeRoute === 'products',
+                },
+            ];
+
             $scope.dropDown = null;
             $scope.getInstance = () => {
                 if (!$scope.dropDown) {
