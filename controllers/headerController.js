@@ -1,37 +1,40 @@
 function headerController(app) {
+    const defaultOptions = {
+        placement: 'bottom',
+        triggerType: 'click',
+        offsetSkidding: 0,
+        offsetDistance: 10,
+        delay: 300,
+    };
+    app.run(function ($rootScope) {
+        $rootScope.initDropDown = (target, trigger, options) => {
+            const $targetEl = document.querySelector(target);
+            if ($targetEl) {
+                const $triggerEl = document.querySelector(trigger);
+                const dropDown = new Dropdown($targetEl, $triggerEl, {
+                    ...defaultOptions,
+                    ...options,
+                });
+                return dropDown;
+            }
+            return null;
+        };
+    });
     app.controller(
         'headerController',
-        function ($scope, $rootScope, cartService) {
-            $scope.headerNavItem = [
-                {
-                    name: 'Home',
-                    src: '/home',
-                    active: $rootScope.activeRoute === 'home',
-                },
-                {
-                    name: 'products',
-                    src: '/products',
-                    active: $rootScope.activeRoute === 'products',
-                },
-            ];
+        function ($scope, $timeout, $rootScope, cartService) {
+            $timeout(function () {
+                $scope.dropDown = $rootScope.initDropDown(
+                    '#userDropDown',
+                    '#trigger',
+                );
+            });
 
-            $scope.dropDown = null;
-            $scope.getInstance = () => {
-                if (!$scope.dropDown) {
-                    $scope.dropDown = $rootScope.initDropDown(
-                        '#userDropDown',
-                        '#trigger',
-                    );
-                }
-                return $scope.dropDown;
-            };
             $scope.toggleDropDown = () => {
-                const dropDown = $scope.getInstance();
-                setTimeout;
-                if (dropDown.isVisible()) {
-                    dropDown.show();
+                if ($scope.dropDown.isVisible()) {
+                    $scope.dropDown.show();
                 } else {
-                    dropDown.hide();
+                    $scope.dropDown.hide();
                 }
             };
 
@@ -70,17 +73,17 @@ function headerController(app) {
                 }
             };
 
-            $scope.user = JSON.parse(localStorage.getItem('user')) || null;
+            $rootScope.user = JSON.parse(localStorage.getItem('user')) || null;
             $scope.signOut = () => {
                 localStorage.removeItem('access_token');
                 localStorage.removeItem('user');
-                $scope.user = null;
+                $rootScope.user = null;
                 window.open('http://localhost:8080/', '_self');
             };
-            $scope.carts = cartService.getCartFromLS();
-            $scope.loading = false;
-            $scope.getTotalQuantity = () => {
-                return $scope.carts.reduce(
+
+            $rootScope.carts = cartService.getCartFromLS();
+            $rootScope.getTotalQuantity = () => {
+                return $rootScope.carts.reduce(
                     (acc, curr) => acc + curr.quantity,
                     0,
                 );

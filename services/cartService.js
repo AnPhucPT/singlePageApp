@@ -4,7 +4,7 @@ function cartService(app) {
             return JSON.parse(localStorage.getItem('cart')) || [];
         };
 
-        const setCartFromLS = (cart) => {
+        const setCartToLS = (cart) => {
             localStorage.setItem('cart', JSON.stringify(cart));
         };
 
@@ -23,7 +23,7 @@ function cartService(app) {
 
         return {
             getCartFromLS,
-            setCartFromLS,
+            setCartToLS,
             addToCart,
         };
     });
