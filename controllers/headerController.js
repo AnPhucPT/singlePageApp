@@ -75,10 +75,15 @@ function headerController(app) {
 
             $rootScope.user = JSON.parse(localStorage.getItem('user')) || null;
             $scope.signOut = () => {
+                $rootScope.loading = true;
+                $scope.dropDown.hide();
                 localStorage.removeItem('access_token');
                 localStorage.removeItem('user');
                 $rootScope.user = null;
-                window.open('http://localhost:8080/', '_self');
+                window.open('#!/', '_self');
+                $timeout(function () {
+                    $rootScope.loading = false;
+                }, 1000);
             };
 
             $rootScope.carts = cartService.getCartFromLS();

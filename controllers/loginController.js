@@ -1,5 +1,5 @@
 function loginController(app) {
-    app.controller('LoginController', function ($scope, $http) {
+    app.controller('loginController', function ($scope, $http) {
         $scope.form = {
             email: '',
             password: '',

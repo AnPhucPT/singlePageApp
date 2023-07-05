@@ -18,6 +18,15 @@ app.run(function ($rootScope, $http) {
         .then((res) => {
             $rootScope.categories = res.data;
         });
+
+    $rootScope.initModal = (selector, options) => {
+        const $targetEl = document.querySelector(selector);
+        const modal = new Modal($targetEl, {
+            ...defaultOptions,
+            ...options,
+        });
+        return modal;
+    };
 });
 
 app.config(function ($routeProvider) {
@@ -32,10 +41,22 @@ app.config(function ($routeProvider) {
         })
         .when('/login', {
             templateUrl: '/pages/login.html',
-            controller: 'LoginController',
+            controller: 'loginController',
+        })
+        .when('/cart', {
+            templateUrl: '/pages/cart.html',
+            controller: 'cartController',
         })
         .otherwise({
             templateUrl: 'views/notFound.html',
         });
 });
+
+const defaultOptions = {
+    placement: 'bottom-right',
+    backdrop: 'dynamic',
+    backdropClasses:
+        'bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40',
+    closable: true,
+};
 export default app;

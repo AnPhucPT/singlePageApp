@@ -1,7 +1,7 @@
 function showSuccessToast() {
     toast({
         title: 'Successfully!',
-        message: `Your Chosen Product has been add to <a class="underline text-sky-500" href="/cart">Cart</a>`,
+        message: `Your Chosen Product has been add to <a class="underline text-sky-500" href="#!cart">Cart</a>`,
         type: 'success',
         duration: 5000,
     });
