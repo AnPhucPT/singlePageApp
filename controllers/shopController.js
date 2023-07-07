@@ -4,19 +4,12 @@ function shopController(app) {
 
     app.controller(
         'shopController',
-        function (
-            $scope,
-            $timeout,
-            $rootScope,
-            cartService,
-            productApi,
-            shopService,
-        ) {
+        function ($scope, $rootScope, cartService, shopService) {
             $scope.searchParams = { ...initialPagination };
             $scope.resetProduct = () => {
                 const { d_searchPrs, d_tagPrs } = shopService.defaultParams;
                 $scope.searchParams = d_searchPrs;
-                $scope.tagParams = d_tagPrs;
+                $scope.tagParams = { ...d_tagPrs, To: $scope.max };
                 $scope.search = '';
             };
 
@@ -61,29 +54,14 @@ function shopController(app) {
             };
 
             $scope.getMinMax = async () => {
-                try {
-                    const res = await productApi.minMax();
-                    $timeout(function () {
-                        $rootScope.loading = false;
-                    }, 500);
-                    const { max } = res.data.data;
-                    $scope.maxValue = max;
-                    $scope.min = 0;
-                    $scope.max = max;
-                    $scope.LeftValue =
-                        ($scope.min / $scope.maxValue) * 100 + '%';
-                    $scope.RightValue =
-                        100 - ($scope.max / $scope.maxValue) * 100 + '%';
-                    $scope.tagParams = {
-                        Category: 'All',
-                        From: 0,
-                        To: $scope.maxValue,
-                    };
-                } catch (error) {
-                    Promise.reject(error);
-                    $rootScope.loading = false;
-                }
+                const res = await shopService.getMinMax($scope.searchParams);
+                const { max, tagParams } = res;
+                $scope.maxValue = max;
+                $scope.min = 0;
+                $scope.max = max;
+                $scope.tagParams = tagParams;
             };
+            $scope.getMinMax();
 
             $scope.getFilterProduct = async () => {
                 const res = await shopService.getProduct($scope.searchParams);
@@ -193,8 +171,6 @@ function shopController(app) {
                     maxPrice: $scope.max,
                 };
             };
-
-            $scope.getMinMax();
 
             $scope.addToCart = (product) => {
                 cartService.addToCart(product);

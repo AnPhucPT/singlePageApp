@@ -8,13 +8,11 @@ function shopService(app) {
                 To: 100,
             },
         };
+
         const getProduct = async (searchParams) => {
             $rootScope.loading = true;
             try {
                 const res = await productApi.filter(searchParams);
-                $timeout(function () {
-                    $rootScope.loading = false;
-                }, 500);
                 const { totalPage, totalItems, datas } = res.data.data;
                 const getTotalPage = () => {
                     return Array.from(
@@ -22,6 +20,11 @@ function shopService(app) {
                         (_, index) => index + 1,
                     );
                 };
+
+                $timeout(function () {
+                    $rootScope.loading = false;
+                }, 500);
+
                 return {
                     getTotalPage,
                     totalPage,
@@ -33,7 +36,29 @@ function shopService(app) {
                 $rootScope.loading = false;
             }
         };
-        return { defaultParams, getProduct };
+
+        const getMinMax = async () => {
+            $rootScope.loading = true;
+            try {
+                const res = await productApi.minMax();
+                const { min, max } = res.data.data;
+
+                const tagParams = {
+                    ...defaultParams.d_tagPrs,
+                    To: max,
+                };
+
+                $timeout(function () {
+                    $rootScope.loading = false;
+                }, 500);
+
+                return { min, max, tagParams };
+            } catch (error) {
+                Promise.reject(error);
+                $rootScope.loading = false;
+            }
+        };
+        return { defaultParams, getProduct, getMinMax };
     });
 }
 
