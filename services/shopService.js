@@ -78,7 +78,39 @@ function shopService(app) {
             };
         };
 
-        return { defaultParams, getProduct, getMinMax, getSearch };
+        const handlePage = (searchParams, totalPage) => {
+            const nextPage = () => {
+                if (searchParams.page < totalPage - 1) {
+                    searchParams = {
+                        ...searchParams,
+                        page: (searchParams.page += 1),
+                    };
+                }
+                return searchParams;
+            };
+            const prevPage = () => {
+                if (searchParams.page > 0) {
+                    searchParams = {
+                        ...searchParams,
+                        page: (searchParams.page -= 1),
+                    };
+                }
+                return searchParams;
+            };
+            const changePage = (index) => {
+                return {
+                    ...searchParams,
+                    page: index - 1,
+                };
+            };
+            return {
+                nextPage,
+                prevPage,
+                changePage,
+            };
+        };
+
+        return { defaultParams, getProduct, getMinMax, getSearch, handlePage };
     });
 }
 

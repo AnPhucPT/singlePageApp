@@ -7,7 +7,7 @@ function shopController(app) {
         function ($scope, $rootScope, cartService, shopService) {
             //init max, tagParam
             $scope.getMinMax = async () => {
-                const res = await shopService.getMinMax($scope.searchParams);
+                const res = await shopService.getMinMax();
                 const { max, tagParams } = res;
                 $scope.maxValue = max;
                 $scope.min = 0;
@@ -21,20 +21,27 @@ function shopController(app) {
             $scope.resetProduct = () => {
                 const { defaultSearchParams, defaultTagParams } =
                     shopService.defaultParams;
-                $scope.searchParams = defaultSearchParams;
+                $scope.searchParams = { ...defaultSearchParams };
                 $scope.tagParams = { ...defaultTagParams, To: $scope.max };
                 console.log($scope.tagParams);
                 $scope.search = '';
             };
 
-            //filter product
+            //filter product & handlePage
+            let handlePage;
             $scope.getFilterProduct = async () => {
+                console.log(1);
                 const res = await shopService.getProduct($scope.searchParams);
                 const { getTotalPage, totalPage, totalItems, datas } = res;
-                $scope.products = datas;
+                $scope.products = [...datas];
                 $scope.totalPage = totalPage;
                 $scope.totalItems = totalItems;
                 $scope.getTotalPage = getTotalPage;
+
+                handlePage = shopService.handlePage(
+                    $scope.searchParams,
+                    $scope.totalPage,
+                );
             };
 
             // TagParam
@@ -70,7 +77,7 @@ function shopController(app) {
                 if (!!($scope.tagParams || $scope.search)) {
                     const { searchParams, tagParams } = shopService.getSearch(
                         $scope.searchParams,
-                        $scope.tagParams ? $scope.tagParams : {},
+                        $scope.tagParams,
                         $scope.search,
                     );
                     $scope.searchParams = { ...searchParams };
@@ -94,28 +101,15 @@ function shopController(app) {
             });
 
             $scope.nextPage = () => {
-                if ($scope.searchParams.page < $scope.totalPage - 1) {
-                    $scope.searchParams = {
-                        ...$scope.searchParams,
-                        page: ($scope.searchParams.page += 1),
-                    };
-                }
+                $scope.searchParams = { ...handlePage.nextPage() };
             };
 
             $scope.prevPage = () => {
-                if ($scope.searchParams.page > 0) {
-                    $scope.searchParams = {
-                        ...$scope.searchParams,
-                        page: ($scope.searchParams.page -= 1),
-                    };
-                }
+                $scope.searchParams = { ...handlePage.prevPage() };
             };
 
             $scope.changePage = (index) => {
-                $scope.searchParams = {
-                    ...$scope.searchParams,
-                    page: index - 1,
-                };
+                $scope.searchParams = { ...handlePage.changePage(index) };
             };
 
             $scope.getProductByCategory_Id = (id, name) => {
