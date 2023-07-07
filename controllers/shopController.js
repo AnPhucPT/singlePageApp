@@ -92,7 +92,6 @@ function shopController(app) {
                 $scope.totalPage = totalPage;
                 $scope.totalItems = totalItems;
                 $scope.getTotalPage = getTotalPage;
-                $scope.$apply();
             };
 
             $scope.$watch('searchParams', function () {

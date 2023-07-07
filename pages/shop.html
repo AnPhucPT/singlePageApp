@@ -25,12 +25,12 @@
                     <h3 class='font-semibold text-lg dark:text-gray-300 mb-3'>Categories</h3>
                     <ul>
                         <li class='py-2 cursor-pointer flex gap-2 items-center hover:pl-4 duration-300 text-gray-900 dark:text-gray-400'>
-                            <ion-icon name="chevron-forward-outline"></ion-icon>
+                            <ion-icon class="dark:text-gray-200" name="chevron-forward-outline"></ion-icon>
                             <a ng-click='resetProduct()' class='text-sm font-medium w-full'>All</a>
                         </li>
                         <div ng-repeat='category in categories'>
                             <li class='py-2 cursor-pointer flex gap-2 items-center hover:pl-4 duration-300 text-gray-900 dark:text-gray-400'>
-                                <ion-icon name="chevron-forward-outline"></ion-icon>
+                                <ion-icon class="dark:text-gray-200" name="chevron-forward-outline"></ion-icon>
                                 <div ng-click='getProductByCategory_Id(category.id, category.name)' class='text-sm font-medium w-full'>
                                     {{category.name}}
                                 </div>
@@ -167,13 +167,10 @@
                         </span>
 
                     </div>
-                    <div class='= bg-white dark:bg-gray-900'>
-                        <label for='table-search' class='sr-only'>Search</label>
-                        <div class='relative mt-1'>
-                            <div class='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
-                                <ion-icon name="search-outline"></ion-icon>
-                            </div>
-                            <input ng-model='search' ng-model-options='{ debounce: 1000 }' type='text' id='table-search' class='block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='Search for items'>
+                    <div class="relative">
+                        <input ng-model='search' ng-model-options='{ debounce: 1000 }' type='text' id='table-search' class=' block p-2 px-4 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-sky-500 focus:border-sky-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-sky-500 dark:focus:border-sky-500' placeholder='Search for items'>
+                        <div ng-if="search" ng-click="deleteTag('Search')" class=' absolute cursor-pointer inset-y-0 right-0 flex items-center px-3 rounded-lg'>
+                            <ion-icon class="dark:text-gray-200" name="close-outline"></ion-icon>
                         </div>
                     </div>
                 </div>
