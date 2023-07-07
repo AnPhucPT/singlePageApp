@@ -114,23 +114,18 @@ function shopController(app) {
             };
 
             $scope.getProductByCategory_Id = (id, name) => {
+                const getProductByCategory_Id =
+                    shopService.getProductByCategory_Id(
+                        $scope.tagParams,
+                        $scope.searchParams,
+                        id,
+                        name,
+                        $scope.search,
+                    );
                 $scope.searchParams = {
-                    ...initialPagination,
-                    keyword: $scope.search,
-                    categoryId: id,
+                    ...getProductByCategory_Id.searchParams,
                 };
-                if ($scope.search) {
-                    $scope.tagParams = {
-                        ...$scope.tagParams,
-                        Search: '" ' + $scope.search + ' "',
-                        Category: name,
-                    };
-                } else {
-                    $scope.tagParams = {
-                        ...$scope.tagParams,
-                        Category: name,
-                    };
-                }
+                $scope.tagParams = { ...getProductByCategory_Id.tagParams };
             };
 
             let getProductByPriceRange;

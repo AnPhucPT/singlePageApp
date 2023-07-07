@@ -47,6 +47,7 @@ function shopService(app) {
                     ...defaultParams.defaultTagParams,
                     To: max,
                 };
+                defaultParams.defaultTagParams.To = max;
 
                 $timeout(function () {
                     $rootScope.loading = false;
@@ -110,21 +111,55 @@ function shopService(app) {
             };
         };
 
-        const getProductByPriceRange = (tag, search, min, max) => {
+        const getProductByPriceRange = (tagPrs, searchPrs, min, max) => {
             const tagParams = () => {
                 return {
-                    ...tag,
+                    ...tagPrs,
                     From: min,
                     To: max,
                 };
             };
             const searchParams = () => {
                 return {
-                    ...search,
+                    ...searchPrs,
                     minPrice: min,
                     maxPrice: max,
                 };
             };
+            return {
+                tagParams,
+                searchParams,
+            };
+        };
+
+        const getProductByCategory_Id = (
+            tagParams,
+            searchParams,
+            id,
+            name,
+            search,
+        ) => {
+            if (search) {
+                searchParams = {
+                    ...defaultParams.defaultSearchParams,
+                    keyword: search,
+                    categoryId: id,
+                };
+                tagParams = {
+                    ...defaultParams.defaultTagParams,
+                    Search: '" ' + search + ' "',
+                    Category: name,
+                };
+            } else {
+                searchParams = {
+                    ...defaultParams.defaultSearchParams,
+                    categoryId: id,
+                };
+                tagParams = {
+                    ...defaultParams.defaultTagParams,
+                    Category: name,
+                };
+            }
             return {
                 tagParams,
                 searchParams,
@@ -138,6 +173,7 @@ function shopService(app) {
             getSearch,
             handlePage,
             getProductByPriceRange,
+            getProductByCategory_Id,
         };
     });
 }
