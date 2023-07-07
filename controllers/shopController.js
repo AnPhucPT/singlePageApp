@@ -5,54 +5,7 @@ function shopController(app) {
     app.controller(
         'shopController',
         function ($scope, $rootScope, cartService, shopService) {
-            $scope.searchParams = { ...initialPagination };
-            $scope.resetProduct = () => {
-                const { d_searchPrs, d_tagPrs } = shopService.defaultParams;
-                $scope.searchParams = d_searchPrs;
-                $scope.tagParams = { ...d_tagPrs, To: $scope.max };
-                $scope.search = '';
-            };
-
-            $scope.deleteTag = (key) => {
-                switch (key) {
-                    case 'Search':
-                        $scope.search = '';
-                        break;
-                    case 'Category':
-                        $scope.tagParams['Category'] = 'All';
-                        if ($scope.searchParams.hasOwnProperty('categoryId')) {
-                            delete $scope.searchParams['categoryId'];
-                            $scope.searchParams = { ...$scope.searchParams };
-                        }
-                        break;
-                    case 'To':
-                        $scope.max = $scope.maxValue;
-                        $scope.searchParams = {
-                            ...$scope.searchParams,
-                            maxPrice: $scope.max,
-                        };
-                        $scope.tagParams = {
-                            ...$scope.tagParams,
-                            To: $scope.maxValue,
-                        };
-                        break;
-                    case 'From':
-                        $scope.min = 0;
-                        $scope.searchParams = {
-                            ...$scope.searchParams,
-                            minPrice: $scope.min,
-                        };
-                        $scope.tagParams = {
-                            ...$scope.tagParams,
-                            From: 0,
-                        };
-                        break;
-                    default:
-                        console.log('key not exist');
-                        break;
-                }
-            };
-
+            //init max, tagParam
             $scope.getMinMax = async () => {
                 const res = await shopService.getMinMax($scope.searchParams);
                 const { max, tagParams } = res;
@@ -63,6 +16,18 @@ function shopController(app) {
             };
             $scope.getMinMax();
 
+            //Reset default
+            $scope.searchParams = { ...initialPagination };
+            $scope.resetProduct = () => {
+                const { defaultSearchParams, defaultTagParams } =
+                    shopService.defaultParams;
+                $scope.searchParams = defaultSearchParams;
+                $scope.tagParams = { ...defaultTagParams, To: $scope.max };
+                console.log($scope.tagParams);
+                $scope.search = '';
+            };
+
+            //filter product
             $scope.getFilterProduct = async () => {
                 const res = await shopService.getProduct($scope.searchParams);
                 const { getTotalPage, totalPage, totalItems, datas } = res;
@@ -72,29 +37,44 @@ function shopController(app) {
                 $scope.getTotalPage = getTotalPage;
             };
 
+            // TagParam
+            $scope.deleteTag = (key) => {
+                switch (key) {
+                    case 'Search':
+                        $scope.search = '';
+                        break;
+                    case 'Category':
+                        $scope.tagParams['Category'] = 'All';
+                        delete $scope.searchParams.categoryId;
+                        $scope.searchParams = { ...$scope.searchParams };
+                        break;
+                    case 'To':
+                        $scope.max = $scope.maxValue;
+                        $scope.getProductByPriceRange();
+                        break;
+                    case 'From':
+                        $scope.min = 0;
+                        $scope.getProductByPriceRange();
+                        break;
+                    default:
+                        console.log('key not exist');
+                        break;
+                }
+            };
+
             $scope.$watch('searchParams', function () {
                 $scope.getFilterProduct();
             });
 
             $scope.$watch('search', function () {
-                if ($scope.search) {
-                    $scope.searchParams = {
-                        ...$scope.searchParams,
-                        page: 0,
-                        pageSize: $scope.searchParams.pageSize,
-                        keyword: $scope.search,
-                    };
-                    $scope.tagParams = {
-                        ...$scope.tagParams,
-                        Search: '" ' + $scope.search + ' "',
-                    };
-                } else {
-                    if ($scope.searchParams.keyword) {
-                        delete $scope.searchParams.keyword;
-                        delete $scope.tagParams.Search;
-                        $scope.searchParams = { ...$scope.searchParams };
-                        $scope.tagParams = { ...$scope.tagParams };
-                    }
+                if (!!($scope.tagParams || $scope.search)) {
+                    const { searchParams, tagParams } = shopService.getSearch(
+                        $scope.searchParams,
+                        $scope.tagParams ? $scope.tagParams : {},
+                        $scope.search,
+                    );
+                    $scope.searchParams = { ...searchParams };
+                    $scope.tagParams = { ...tagParams };
                 }
             });
 
@@ -110,7 +90,6 @@ function shopController(app) {
                 if ($scope.max - $scope.min < priceGap) {
                     $scope.min = $scope.max - priceGap;
                 }
-
                 $scope.LeftValue = ($scope.min / $scope.maxValue) * 100 + '%';
             });
 

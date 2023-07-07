@@ -1,8 +1,8 @@
 function shopService(app) {
     app.factory('shopService', function (productApi, $timeout, $rootScope) {
         const defaultParams = {
-            d_searchPrs: { page: 0, pageSize: 8 },
-            d_tagPrs: {
+            defaultSearchParams: { page: 0, pageSize: 8 },
+            defaultTagParams: {
                 Category: 'All',
                 From: 0,
                 To: 100,
@@ -44,7 +44,7 @@ function shopService(app) {
                 const { min, max } = res.data.data;
 
                 const tagParams = {
-                    ...defaultParams.d_tagPrs,
+                    ...defaultParams.defaultTagParams,
                     To: max,
                 };
 
@@ -58,7 +58,27 @@ function shopService(app) {
                 $rootScope.loading = false;
             }
         };
-        return { defaultParams, getProduct, getMinMax };
+
+        const getSearch = (searchParams, tagParams, search) => {
+            if (search) {
+                searchParams = {
+                    ...searchParams,
+                    page: 0,
+                    keyword: search,
+                };
+                tagParams = { ...tagParams, Search: '" ' + search + ' "' };
+            } else {
+                delete searchParams.keyword;
+                delete tagParams.Search;
+            }
+
+            return {
+                searchParams,
+                tagParams,
+            };
+        };
+
+        return { defaultParams, getProduct, getMinMax, getSearch };
     });
 }
 
