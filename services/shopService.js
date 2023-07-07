@@ -110,7 +110,35 @@ function shopService(app) {
             };
         };
 
-        return { defaultParams, getProduct, getMinMax, getSearch, handlePage };
+        const getProductByPriceRange = (tag, search, min, max) => {
+            const tagParams = () => {
+                return {
+                    ...tag,
+                    From: min,
+                    To: max,
+                };
+            };
+            const searchParams = () => {
+                return {
+                    ...search,
+                    minPrice: min,
+                    maxPrice: max,
+                };
+            };
+            return {
+                tagParams,
+                searchParams,
+            };
+        };
+
+        return {
+            defaultParams,
+            getProduct,
+            getMinMax,
+            getSearch,
+            handlePage,
+            getProductByPriceRange,
+        };
     });
 }
 

@@ -30,7 +30,6 @@ function shopController(app) {
             //filter product & handlePage
             let handlePage;
             $scope.getFilterProduct = async () => {
-                console.log(1);
                 const res = await shopService.getProduct($scope.searchParams);
                 const { getTotalPage, totalPage, totalItems, datas } = res;
                 $scope.products = [...datas];
@@ -91,6 +90,7 @@ function shopController(app) {
                 }
                 $scope.RightValue =
                     100 - ($scope.max / $scope.maxValue) * 100 + '%';
+                $scope.initGetProductByPriceRange();
             });
 
             $scope.$watch('min', function () {
@@ -98,6 +98,7 @@ function shopController(app) {
                     $scope.min = $scope.max - priceGap;
                 }
                 $scope.LeftValue = ($scope.min / $scope.maxValue) * 100 + '%';
+                $scope.initGetProductByPriceRange();
             });
 
             $scope.nextPage = () => {
@@ -132,16 +133,20 @@ function shopController(app) {
                 }
             };
 
+            let getProductByPriceRange;
+            $scope.initGetProductByPriceRange = () => {
+                getProductByPriceRange = shopService.getProductByPriceRange(
+                    $scope.tagParams,
+                    $scope.searchParams,
+                    $scope.min,
+                    $scope.max,
+                );
+            };
+
             $scope.getProductByPriceRange = () => {
-                $scope.tagParams = {
-                    ...$scope.tagParams,
-                    From: $scope.min,
-                    To: $scope.max,
-                };
+                $scope.tagParams = { ...getProductByPriceRange.tagParams() };
                 $scope.searchParams = {
-                    ...$scope.searchParams,
-                    minPrice: $scope.min,
-                    maxPrice: $scope.max,
+                    ...getProductByPriceRange.searchParams(),
                 };
             };
 
