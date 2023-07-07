@@ -1,3 +1,3 @@
 import cartService from './cartService.js';
-
-export default { cartService };
+import shopService from './shopService.js';
+export default { cartService, shopService };

@@ -73,7 +73,6 @@ function headerController(app) {
                 }
             };
 
-            $rootScope.user = JSON.parse(localStorage.getItem('user')) || null;
             $scope.signOut = () => {
                 $rootScope.loading = true;
                 $scope.dropDown.hide();

@@ -31,7 +31,7 @@
                         <div ng-repeat='category in categories'>
                             <li class='py-2 cursor-pointer flex gap-2 items-center hover:pl-4 duration-300 text-gray-900 dark:text-gray-400'>
                                 <ion-icon name="chevron-forward-outline"></ion-icon>
-                                <div ng-click='getProductByCategory_Id(category.id)' class='text-sm font-medium w-full'>
+                                <div ng-click='getProductByCategory_Id(category.id, category.name)' class='text-sm font-medium w-full'>
                                     {{category.name}}
                                 </div>
                             </li>
@@ -74,8 +74,8 @@
                             <div ng-style="{ right: RightValue, left: LeftValue }" id="progress" class=' absolute h-full rounded-lg bg-sky-500'></div>
                         </div>
                         <div class='range-input h-1 relative'>
-                            <input ng-model='min' min='{{minValue}}' max='{{maxValue}}' step='1' id="small-range" type="range" value="50" class="absolute top-[-5px] pointer-events-none bg-transparent w-full h-1 mb-6  rounded-lg appearance-none cursor-pointer range-sm ">
-                            <input ng-model='max' min='{{minValue}}' max='{{maxValue}}' step='1' id="small-range" type="range" value="50" class="absolute top-[-5px] pointer-events-none bg-transparent w-full h-1 mb-6  rounded-lg appearance-none cursor-pointer range-sm ">
+                            <input ng-model='min' min='0' max='{{maxValue}}' step='1' id="small-range" type="range" value="50" class="absolute top-[-5px] pointer-events-none bg-transparent w-full h-1 mb-6  rounded-lg appearance-none cursor-pointer range-sm ">
+                            <input ng-model='max' min='0' max='{{maxValue}}' step='1' id="small-range" type="range" value="50" class="absolute top-[-5px] pointer-events-none bg-transparent w-full h-1 mb-6  rounded-lg appearance-none cursor-pointer range-sm ">
                         </div>
                     </div>
                     <button ng-click='getProductByPriceRange()' class='py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-sky-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700'>
@@ -139,6 +139,17 @@
 
 
             <div class='flex-1'>
+                <div>
+                    <ul class='flex'>
+                        <li></li>
+                        <li ng-repeat="(key, value) in tagParams">
+                            <div class='inline-flex cursor-default mr-1 items-center bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-medium  rounded-xl dark:bg-gray-700 dark:hover:bg-gray-800 dark:text-gray-300'>
+                                <div class="px-2.5 py-2">{{key}}: {{value}}</div>
+                                <ion-icon ng-click="deleteTag(key)" ng-if="value !== 'All' && value !== 0 && value !== 100 " class="pb-2 pr-2 pl-0 pt-[0.6rem] cursor-pointer" name="close-outline"></ion-icon>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
                 <div class='flex justify-between items-center gap-2 mb-6'>
                     <div class=' dark:text-gray-300'>
                         <span ng-if="products.length > 0">
@@ -215,9 +226,6 @@
                         </ul>
                     </nav>
                 </section>
-
-
-
             </div>
         </div>
     </section>

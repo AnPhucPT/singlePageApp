@@ -1,5 +1,5 @@
 function cartService(app) {
-    app.factory('cartService', function ($rootScope) {
+    app.factory('cartService', function ($rootScope, $timeout) {
         const getCartFromLS = () => {
             return JSON.parse(localStorage.getItem('cart')) || [];
         };
@@ -9,16 +9,22 @@ function cartService(app) {
         };
 
         const addToCart = (product, quantity = 1) => {
+            $rootScope.loading = true;
             let cartItems = getCartFromLS();
             let index = cartItems.findIndex((item) => item.id === product.id);
             if (index === -1) {
                 cartItems = [...cartItems, { ...product, quantity }];
-                console.log(cartItems);
             } else {
                 cartItems[index].quantity =
                     cartItems[index].quantity + quantity;
             }
             setCartToLS(cartItems);
+            $timeout(function () {
+                $rootScope.loading = false;
+            }, 500);
+            $timeout(function () {
+                showSuccessToast();
+            }, 700);
         };
 
         return {

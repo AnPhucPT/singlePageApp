@@ -11,27 +11,26 @@ function cartController(app) {
                     );
                 }
                 cartService.setCartToLS($scope.products);
-                $rootScope.hideModal();
+                $scope.hideModal();
             };
 
-            $rootScope.modal = $rootScope.initModal('#deleteModal');
+            $scope.modal = $rootScope.initModal('#deleteModal');
 
-            $rootScope.showModal = () => {
-                $rootScope.modal.show();
+            $scope.showModal = () => {
+                $scope.modal.show();
             };
 
-            $rootScope.hideModal = () => {
-                $rootScope.modal.hide();
+            $scope.hideModal = () => {
+                $scope.modal.hide();
             };
 
             $rootScope.setRemoveProduct = (product) => {
-                $rootScope.showModal();
+                $scope.showModal();
                 $scope.removeProduct = product;
             };
 
             $scope.submit = () => {
                 $rootScope.loading = true;
-                console.log(localStorage.getItem('access_token'));
                 const shipFee = $scope.getTax();
                 const orderItemDTOS = $scope.products.map((product) => ({
                     quantity: product.quantity,
@@ -40,7 +39,7 @@ function cartController(app) {
                 const address = 'HCM';
                 const formData = { shipFee, orderItemDTOS, address };
                 $http
-                    .post('http://localhost:8080/api/order', formData, {
+                    .post('http://localhost:8080/api/public/order', formData, {
                         headers: {
                             Authorization:
                                 'Bearer ' +

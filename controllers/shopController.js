@@ -4,44 +4,99 @@ function shopController(app) {
 
     app.controller(
         'shopController',
-        function ($scope, $http, $timeout, $rootScope, cartService) {
+        function (
+            $scope,
+            $timeout,
+            $rootScope,
+            cartService,
+            productApi,
+            shopService,
+        ) {
             $scope.searchParams = { ...initialPagination };
-            $scope.search = '';
-
             $scope.resetProduct = () => {
-                $scope.searchParams = { ...initialPagination };
+                const { d_searchPrs, d_tagPrs } = shopService.defaultParams;
+                $scope.searchParams = d_searchPrs;
+                $scope.tagParams = d_tagPrs;
                 $scope.search = '';
             };
 
-            $scope.getAllProduct = () => {
-                $rootScope.loading = true;
-                $http
-                    .get('http://localhost:8080/api/public/products/filter', {
-                        params: $scope.searchParams,
-                    })
-                    .then((res) => {
-                        $scope.products = res.data.data.datas;
-                        $scope.totalPage = res.data.data.totalPage;
-                        $scope.totalItems = res.data.data.totalItems;
-                        $scope.getTotalPage = () => {
-                            return Array.from(
-                                { length: $scope.totalPage },
-                                (_, index) => index + 1,
-                            );
+            $scope.deleteTag = (key) => {
+                switch (key) {
+                    case 'Search':
+                        $scope.search = '';
+                        break;
+                    case 'Category':
+                        $scope.tagParams['Category'] = 'All';
+                        if ($scope.searchParams.hasOwnProperty('categoryId')) {
+                            delete $scope.searchParams['categoryId'];
+                            $scope.searchParams = { ...$scope.searchParams };
+                        }
+                        break;
+                    case 'To':
+                        $scope.max = $scope.maxValue;
+                        $scope.searchParams = {
+                            ...$scope.searchParams,
+                            maxPrice: $scope.max,
                         };
-                    })
-                    .catch((err) => {
-                        Promise.reject(err);
-                    })
-                    .finally(() => {
-                        $timeout(function () {
-                            $rootScope.loading = false;
-                        }, 300);
-                    });
+                        $scope.tagParams = {
+                            ...$scope.tagParams,
+                            To: $scope.maxValue,
+                        };
+                        break;
+                    case 'From':
+                        $scope.min = 0;
+                        $scope.searchParams = {
+                            ...$scope.searchParams,
+                            minPrice: $scope.min,
+                        };
+                        $scope.tagParams = {
+                            ...$scope.tagParams,
+                            From: 0,
+                        };
+                        break;
+                    default:
+                        console.log('key not exist');
+                        break;
+                }
+            };
+
+            $scope.getMinMax = async () => {
+                try {
+                    const res = await productApi.minMax();
+                    $timeout(function () {
+                        $rootScope.loading = false;
+                    }, 500);
+                    const { max } = res.data.data;
+                    $scope.maxValue = max;
+                    $scope.min = 0;
+                    $scope.max = max;
+                    $scope.LeftValue =
+                        ($scope.min / $scope.maxValue) * 100 + '%';
+                    $scope.RightValue =
+                        100 - ($scope.max / $scope.maxValue) * 100 + '%';
+                    $scope.tagParams = {
+                        Category: 'All',
+                        From: 0,
+                        To: $scope.maxValue,
+                    };
+                } catch (error) {
+                    Promise.reject(error);
+                    $rootScope.loading = false;
+                }
+            };
+
+            $scope.getFilterProduct = async () => {
+                const res = await shopService.getProduct($scope.searchParams);
+                const { getTotalPage, totalPage, totalItems, datas } = res;
+                $scope.products = datas;
+                $scope.totalPage = totalPage;
+                $scope.totalItems = totalItems;
+                $scope.getTotalPage = getTotalPage;
+                $scope.$apply();
             };
 
             $scope.$watch('searchParams', function () {
-                $scope.getAllProduct();
+                $scope.getFilterProduct();
             });
 
             $scope.$watch('search', function () {
@@ -52,10 +107,16 @@ function shopController(app) {
                         pageSize: $scope.searchParams.pageSize,
                         keyword: $scope.search,
                     };
+                    $scope.tagParams = {
+                        ...$scope.tagParams,
+                        Search: '" ' + $scope.search + ' "',
+                    };
                 } else {
                     if ($scope.searchParams.keyword) {
                         delete $scope.searchParams.keyword;
+                        delete $scope.tagParams.Search;
                         $scope.searchParams = { ...$scope.searchParams };
+                        $scope.tagParams = { ...$scope.tagParams };
                     }
                 }
             });
@@ -72,6 +133,7 @@ function shopController(app) {
                 if ($scope.max - $scope.min < priceGap) {
                     $scope.min = $scope.max - priceGap;
                 }
+
                 $scope.LeftValue = ($scope.min / $scope.maxValue) * 100 + '%';
             });
 
@@ -83,6 +145,7 @@ function shopController(app) {
                     };
                 }
             };
+
             $scope.prevPage = () => {
                 if ($scope.searchParams.page > 0) {
                     $scope.searchParams = {
@@ -99,14 +162,32 @@ function shopController(app) {
                 };
             };
 
-            $scope.getProductByCategory_Id = (id) => {
+            $scope.getProductByCategory_Id = (id, name) => {
                 $scope.searchParams = {
-                    ...$scope.searchParams,
+                    ...initialPagination,
+                    keyword: $scope.search,
                     categoryId: id,
                 };
+                if ($scope.search) {
+                    $scope.tagParams = {
+                        ...$scope.tagParams,
+                        Search: '" ' + $scope.search + ' "',
+                        Category: name,
+                    };
+                } else {
+                    $scope.tagParams = {
+                        ...$scope.tagParams,
+                        Category: name,
+                    };
+                }
             };
 
             $scope.getProductByPriceRange = () => {
+                $scope.tagParams = {
+                    ...$scope.tagParams,
+                    From: $scope.min,
+                    To: $scope.max,
+                };
                 $scope.searchParams = {
                     ...$scope.searchParams,
                     minPrice: $scope.min,
@@ -114,33 +195,11 @@ function shopController(app) {
                 };
             };
 
-            $scope.getMinMax = () => {
-                $http
-                    .get('http://localhost:8080/api/public/product/min-max')
-                    .then((res) => {
-                        $scope.minValue = 0;
-                        $scope.maxValue = res.data.data.max + 30;
-                        $scope.min = res.data.data.min;
-                        $scope.max = res.data.data.max;
-                        $scope.LeftValue =
-                            ($scope.min / $scope.maxValue) * 100 + '%';
-                        $scope.RightValue =
-                            100 - ($scope.max / $scope.maxValue) * 100 + '%';
-                    });
-            };
-
             $scope.getMinMax();
 
             $scope.addToCart = (product) => {
-                $rootScope.loading = true;
                 cartService.addToCart(product);
                 $rootScope.carts = cartService.getCartFromLS();
-                $timeout(function () {
-                    $rootScope.loading = false;
-                }, 500);
-                $timeout(function () {
-                    showSuccessToast();
-                }, 700);
             };
         },
     );

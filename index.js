@@ -1,15 +1,19 @@
 import controller from './controllers/controller.js';
 import service from './services/service.js';
+import api from './api/api.js';
+
 const app = angular.module('app', ['ngRoute']);
 
-// set up controller
-for (const key in controller) {
-    controller[key](app);
+for (const key in api) {
+    api[key](app);
 }
-
 // setup service
 for (const key in service) {
     service[key](app);
+}
+// set up controller
+for (const key in controller) {
+    controller[key](app);
 }
 
 app.run(function ($rootScope, $http) {
@@ -27,9 +31,11 @@ app.run(function ($rootScope, $http) {
         });
         return modal;
     };
+
+    $rootScope.user = JSON.parse(localStorage.getItem('user')) || null;
 });
 
-app.config(function ($routeProvider) {
+app.config(function ($routeProvider, $locationProvider) {
     $routeProvider
         .when('/', {
             templateUrl: '/pages/home.html',
@@ -46,6 +52,10 @@ app.config(function ($routeProvider) {
         .when('/cart', {
             templateUrl: '/pages/cart.html',
             controller: 'cartController',
+        })
+        .when('/order', {
+            templateUrl: '/pages/order.html',
+            controller: 'orderController',
         })
         .otherwise({
             templateUrl: 'views/notFound.html',
