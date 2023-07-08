@@ -45,8 +45,7 @@ function shopController(app) {
                     break;
                 case 'Category':
                     $scope.tagParams['Category'] = 'All';
-                    delete $scope.searchParams.categoryId;
-                    $scope.searchParams = { ...$scope.searchParams };
+                    $scope.searchParams = { ..._.omit($scope.searchParams, 'categoryId') };
                     break;
                 case 'To':
                     $scope.max = $scope.maxValue;
@@ -76,19 +75,13 @@ function shopController(app) {
         });
 
         $scope.$watch('max', function () {
-            if ($scope.max - $scope.min < priceGap) {
-                $scope.max = $scope.min + priceGap;
-            }
+            $scope.max = $scope.max - $scope.min < priceGap ? $scope.min + priceGap : $scope.max;
             $scope.RightValue = 100 - ($scope.max / $scope.maxValue) * 100 + '%';
-            $scope.initGetProductByPriceRange();
         });
 
         $scope.$watch('min', function () {
-            if ($scope.max - $scope.min < priceGap) {
-                $scope.min = $scope.max - priceGap;
-            }
+            $scope.min = $scope.max - $scope.min < priceGap ? $scope.max - priceGap : $scope.min;
             $scope.LeftValue = ($scope.min / $scope.maxValue) * 100 + '%';
-            $scope.initGetProductByPriceRange();
         });
 
         $scope.nextPage = () => {
@@ -110,14 +103,11 @@ function shopController(app) {
             $scope.tagParams = { ...getProductByCategory_Id.tagParams };
         };
 
-        let getProductByPriceRange;
-        $scope.initGetProductByPriceRange = () => {
-            getProductByPriceRange = shopService.getProductByPriceRange($scope.tagParams, $scope.searchParams, $scope.min, $scope.max);
-        };
-
         $scope.getProductByPriceRange = () => {
-            $scope.tagParams = { ...getProductByPriceRange.tagParams() };
-            $scope.searchParams = { ...getProductByPriceRange.searchParams() };
+            const getProductByPriceRange = shopService.getProductByPriceRange($scope.tagParams, $scope.searchParams, $scope.min, $scope.max);
+            //
+            $scope.tagParams = { ...getProductByPriceRange.tagParams };
+            $scope.searchParams = { ...getProductByPriceRange.searchParams };
         };
 
         $scope.addToCart = (product) => {

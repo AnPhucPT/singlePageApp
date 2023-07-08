@@ -15,10 +15,7 @@ function shopService(app) {
                 const res = await productApi.filter(searchParams);
                 const { totalPage, totalItems, datas } = res.data.data;
                 const getTotalPage = () => {
-                    return Array.from(
-                        { length: totalPage },
-                        (_, index) => index + 1,
-                    );
+                    return Array.from({ length: totalPage }, (_, index) => index + 1);
                 };
 
                 $timeout(function () {
@@ -111,20 +108,16 @@ function shopService(app) {
             };
         };
 
-        const getProductByPriceRange = (tagPrs, searchPrs, min, max) => {
-            const tagParams = () => {
-                return {
-                    ...tagPrs,
-                    From: min,
-                    To: max,
-                };
+        const getProductByPriceRange = (tagParams, searchParams, min, max) => {
+            tagParams = {
+                ...tagParams,
+                From: min,
+                To: max,
             };
-            const searchParams = () => {
-                return {
-                    ...searchPrs,
-                    minPrice: min,
-                    maxPrice: max,
-                };
+            searchParams = {
+                ...searchParams,
+                minPrice: min,
+                maxPrice: max,
             };
             return {
                 tagParams,
@@ -132,38 +125,15 @@ function shopService(app) {
             };
         };
 
-        const getProductByCategory_Id = (
-            tagParams,
-            searchParams,
-            id,
-            name,
-            search,
-        ) => {
+        const getProductByCategory_Id = (tagParams, searchParams, id, name, search) => {
             if (search) {
-                searchParams = {
-                    ...defaultParams.defaultSearchParams,
-                    keyword: search,
-                    categoryId: id,
-                };
-                tagParams = {
-                    ...defaultParams.defaultTagParams,
-                    Search: '" ' + search + ' "',
-                    Category: name,
-                };
+                searchParams = { ...defaultParams.defaultSearchParams, keyword: search, categoryId: id };
+                tagParams = { ...defaultParams.defaultTagParams, Search: '" ' + search + ' "', Category: name };
             } else {
-                searchParams = {
-                    ...defaultParams.defaultSearchParams,
-                    categoryId: id,
-                };
-                tagParams = {
-                    ...defaultParams.defaultTagParams,
-                    Category: name,
-                };
+                searchParams = { ...defaultParams.defaultSearchParams, categoryId: id };
+                tagParams = { ...defaultParams.defaultTagParams, Category: name };
             }
-            return {
-                tagParams,
-                searchParams,
-            };
+            return { tagParams, searchParams };
         };
 
         return {
